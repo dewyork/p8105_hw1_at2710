@@ -1,0 +1,62 @@
+---
+title: "Homework 1"
+author: "Anusorn Thanataveerat"
+date: '2018-09-13'
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+I'm an R Markdown document! 
+
+# Section 1
+
+Here's a **code chunk** that samples from 
+a _normal distribution_:
+
+```{r sample_chunk, echo = TRUE}
+samp = rnorm(100)
+length(samp)
+```
+
+# Section 2
+
+I can take the mean of the sample, too!
+The mean is `r round(mean(samp), 3)`.
+`this is code mean(samp)`
+
+
+Learning assessment: Write a named code chunk that creates a variable containing a sample of size 500 from a random normal variable, computes the absolute value of each element, and produces a histogram of the result. Add an inline summary giving the median value rounded to two decimal places. What happens if you set eval = FALSE to the code chunk? What about  echo = FALSE?
+
+```{r assessment2, echo = TRUE}
+unif <- rnorm(500)
+unif_abs <- abs(unif)
+hist(unif_abs)
+```
+
+
+```{r plot_histogram, echo = TRUE}
+# ggplot(unif_abs,)
+library(tidyverse)
+qplot(unif_abs, geom="histogram")
+
+```
+
+
+```{r learning_assessment_1}
+la_df = tibble(
+  norm_samp = rnorm(500),
+  abs_norm_samp = abs(norm_samp)
+)
+
+ggplot(la_df, aes(x = abs_norm_samp)) + geom_histogram()
+```
+
+The median of the variable containing absolute values is 
+`r round(median(la_df$abs_norm_samp), digits = 2)`.
+
+
+
+
