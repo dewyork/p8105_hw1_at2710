@@ -9,9 +9,38 @@ output:
     code_folding: hide
 ---
 
-I'm an R Markdown document! 
+# Problem 1
 
-# Section 1
+Create a data frame comprised of:
+
+* A random sample of size 10 from a uniform[0, 5] distribution
+* A logical vector indicating whether elements of the sample are greater than 2
+* A (length-10) character vector
+* A (length-10) factor vector
+```{r Load_Package, include = FALSE}
+library(tidyverse)
+```
+```{r Create_tbl, echo = TRUE}
+set.seed(345)
+
+sample.size <- 10
+
+df <- tibble( x = runif(sample.size, 0, 5),
+              x_GT_2 = x > 2,
+              char_var = as.character(c(1:10)),
+              fct_var = as.factor(c(1:10)) 
+              )
+
+print(df)
+```
+
+Try to take the mean of each variable in your dataframe. What works and what doesn’t? Why?
+```{r mean, echo = TRUE}
+df %>% summarise_each(funs(mean))
+```
+**Answer**: the mean function only works with numeric and logic type data. With logic type data, it treats `TRUE` to 1 and `FALSE` to 0 before applying the mean function. And to be clear, it doesn't work with factor and character type data which is understandable given how subjective it must be to start assigning numbers to these types of data.
+
+In some cases, you can explicitly convert variables from one type to another. Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens? In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?
 
 Here's a **code chunk** that samples from 
 a _normal distribution_:
@@ -21,7 +50,7 @@ samp = rnorm(100)
 length(samp)
 ```
 
-# Section 2
+# Problem 2
 
 I can take the mean of the sample, too!
 The mean is `r round(mean(samp), 3)`.
