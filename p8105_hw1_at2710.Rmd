@@ -61,11 +61,6 @@ df_new_convert <-
 ```
 **Answer**: When the character is converted to factor, the output doesn't change but the levels are created based on the input character. So we can see that the number 10 is at level 2 from the bottom (since 1 comes before 2, 3 and so on) and that explains why it is eventually coded as 2 when converted to numeric at the end. For the other example, the final product keeps the 'face value' of the variable, ignoring the level information (which is due to the function as.character()).
 
-```{r sample_chunk, echo = TRUE}
-samp = rnorm(100)
-length(samp)
-```
-
 # Problem 2
 
 This problem focuses on plotting and the use of inline R code.
@@ -102,7 +97,7 @@ color_numeric <- ggplot(data = df) + geom_point(aes(x = x, y = y, color = xy_GT_
 color_factor <- ggplot(data = df) + geom_point(aes(x = x, y = y, color = xy_GT_0_fct))
 grid.arrange(color_logic, color_numeric, color_factor)
 ```
-**Answer**
+**Answer**The color scales of the ones using logical and factor variables are the same which compose of two distinct colors. They are treated as discrete variables while for the numeric variable you will see a color gradient ranging from 0 (minimum) to 1 (maximum) which each point is allowed to be coded as but we don't see the variaion here since we only have 2 distinct values (0 and 1). In short, the numeric variable is treated as continuous variable. 
 
 Export your first scatterplot to your project directory using ggsave.
 ```{r, echo = TRUE}
