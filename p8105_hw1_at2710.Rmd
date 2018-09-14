@@ -19,6 +19,7 @@ Create a data frame comprised of:
 * A (length-10) factor vector
 ```{r Load_Package, include = FALSE}
 library(tidyverse)
+library(gridExtra)
 ```
 ```{r Create_tbl, echo = TRUE}
 set.seed(345)
@@ -54,7 +55,8 @@ Again, it converts `TRUE` to 1 and `FALSE` to 0 for logic variable. For characte
 
 In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?
 ```{r convert_type_V2, echo = TRUE, eval = FALSE}
-df_new_convert <- df %>% mutate(char_var = as.numeric(as.factor(char_var)),
+df_new_convert <-
+  df %>% mutate(char_var = as.numeric(as.factor(char_var)),
   fct_var = as.numeric(as.character(fct_var)))
 ```
 **Answer**: When the character is converted to factor, the output doesn't change but the levels are created based on the input character. So we can see that the number 10 is at level 2 from the bottom (since 1 comes before 2, 3 and so on) and that explains why it is eventually coded as 2 when converted to numeric at the end. For the other example, the final product keeps the 'face value' of the variable, ignoring the level information (which is due to the function as.character()).
@@ -69,52 +71,45 @@ length(samp)
 This problem focuses on plotting and the use of inline R code.
 
 Create a data frame comprised of:
+
 * x: a random sample of size 1000 from a standard Normal distribution
 * y: a random sample of size 1000 from a standard Normal distribution
 * A logical vector indicating whether the x + y > 0
 * A numeric vector created by coercing the above logical vector
 * A factor vector created by coercing the above logical vector
+```{r plot_create, echo = TRUE}
+set.seed(345)
+
+sample.size <- 1000
+
+df <- tibble(
+x = rnorm(sample.size),
+y = rnorm(sample.size),
+xy_GT_0 = x + y > 0,
+xy_GT_0_bin = as.numeric(xy_GT_0),
+xy_GT_0_fct = as.factor(xy_GT_0)
+)
+```
+
 Write a short description of your vector using inline R code, including: * the size of the dataset * the mean and median of x * the proportion of cases for which the logical vector is TRUE
 
-Make a scatterplot of y vs x; color points using the logical variable (adding color = ... inside of aes in your ggplot code should help). Make a second and third scatterplot that color points using the numeric and factor variables, respectively, and comment on the color scales.
+**Answer**:This data set consists of `r sample.size` observations with 2 continuous variables (_x_,_y_) with mean (`r round(mean(df$x), 3)`,`r round(mean(df$y), 3)`) and median (`r round(median(df$x), 3)`, `r round(median(df$y), 3)`). There are `r sum(df$xy_GT_0)/10`% of the observations whose summation of _x_ and _y_ is greater than zero. 
+
+Make a scatterplot of y vs x; color points using the logical variable. Make a second and third scatterplot that color points using the numeric and factor variables, respectively, and comment on the color scales.
+```{r scatterplot, echo = TRUE}
+color_logic <- ggplot(data = df) + geom_point(aes(x = x, y = y, color = xy_GT_0))
+color_numeric <- ggplot(data = df) + geom_point(aes(x = x, y = y, color = xy_GT_0_bin))
+color_factor <- ggplot(data = df) + geom_point(aes(x = x, y = y, color = xy_GT_0_fct))
+grid.arrange(color_logic, color_numeric, color_factor)
+```
+**Answer**
 
 Export your first scatterplot to your project directory using ggsave.
-
-
-
-I can take the mean of the sample, too!
-The mean is `r round(mean(samp), 3)`.
-`this is code mean(samp)`
-
-
-Learning assessment: Write a named code chunk that creates a variable containing a sample of size 500 from a random normal variable, computes the absolute value of each element, and produces a histogram of the result. Add an inline summary giving the median value rounded to two decimal places. What happens if you set eval = FALSE to the code chunk? What about  echo = FALSE?
-
-```{r assessment2, echo = TRUE}
-unif <- rnorm(500)
-unif_abs <- abs(unif)
-hist(unif_abs)
+```{r, echo = TRUE}
+png("Scatterplot_1.png")
+print(color_logic)
+dev.off()
 ```
-
-
-```{r plot_histogram, echo = TRUE}
-# ggplot(unif_abs,)
-library(tidyverse)
-qplot(unif_abs, geom="histogram")
-
-```
-
-
-```{r learning_assessment_1}
-la_df = tibble(
-  norm_samp = rnorm(500),
-  abs_norm_samp = abs(norm_samp)
-)
-
-ggplot(la_df, aes(x = abs_norm_samp)) + geom_histogram()
-```
-
-The median of the variable containing absolute values is 
-`r round(median(la_df$abs_norm_samp), digits = 2)`.
 
 
 
