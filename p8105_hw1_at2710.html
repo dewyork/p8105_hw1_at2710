@@ -257,31 +257,29 @@ div.tocify {
 
 sample.size &lt;- 10
 
-df &lt;- tibble( x = runif(sample.size, 0, 5),
-              x_GT_2 = x &gt; 2,
-              char_var = as.character(c(1:10)),
-              fct_var = as.factor(c(1:10)) 
-              )
+df &lt;- tibble(
+x = runif(sample.size, 0, 5),
+x_GT_2 = x &gt; 2,
+char_var = as.character(c(1:10)),
+fct_var = as.factor(c(1, 1, 2, 3, 1, 1, 7, 100, 500, 5))
+)
 
 print(df)</code></pre>
 <pre><code>## # A tibble: 10 x 4
 ##        x x_GT_2 char_var fct_var
 ##    &lt;dbl&gt; &lt;lgl&gt;  &lt;chr&gt;    &lt;fct&gt;  
 ##  1 1.08  FALSE  1        1      
-##  2 1.37  FALSE  2        2      
-##  3 1.95  FALSE  3        3      
-##  4 3.28  TRUE   4        4      
-##  5 2.18  TRUE   5        5      
-##  6 4.02  TRUE   6        6      
+##  2 1.37  FALSE  2        1      
+##  3 1.95  FALSE  3        2      
+##  4 3.28  TRUE   4        3      
+##  5 2.18  TRUE   5        1      
+##  6 4.02  TRUE   6        1      
 ##  7 1.93  FALSE  7        7      
-##  8 4.17  TRUE   8        8      
-##  9 2.37  TRUE   9        9      
-## 10 0.467 FALSE  10       10</code></pre>
+##  8 4.17  TRUE   8        100    
+##  9 2.37  TRUE   9        500    
+## 10 0.467 FALSE  10       5</code></pre>
 <p>Try to take the mean of each variable in your dataframe. What works and what doesn’t? Why?</p>
-<pre class="r"><code>df %&gt;% summarise_each(funs(mean))</code></pre>
-<pre><code>## `summarise_each()` is deprecated.
-## Use `summarise_all()`, `summarise_at()` or `summarise_if()` instead.
-## To map `funs` over all variables, use `summarise_all()`</code></pre>
+<pre class="r"><code>df %&gt;% summarise_all(funs(mean))</code></pre>
 <pre><code>## Warning in mean.default(char_var): argument is not numeric or logical:
 ## returning NA</code></pre>
 <pre><code>## Warning in mean.default(fct_var): argument is not numeric or logical:
@@ -291,14 +289,27 @@ print(df)</code></pre>
 ##   &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
 ## 1  2.28    0.5       NA      NA</code></pre>
 <p><strong>Answer</strong>: the mean function only works with numeric and logic type data. With logic type data, it treats <code>TRUE</code> to 1 and <code>FALSE</code> to 0 before applying the mean function. And to be clear, it doesn’t work with factor and character type data which is understandable given how subjective it must be to start assigning numbers to these types of data.</p>
-<p>In some cases, you can explicitly convert variables from one type to another. Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens? In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?</p>
-<p>Here’s a <strong>code chunk</strong> that samples from a <em>normal distribution</em>:</p>
+<p>In some cases, you can explicitly convert variables from one type to another. Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens?</p>
+<pre class="r"><code>df_convert &lt;- df %&gt;% mutate(
+  x_GT_2 = as.numeric(x_GT_2),
+  char_var = as.numeric(char_var),
+  fct_var = as.numeric(fct_var)
+  )</code></pre>
+<p><strong>Answer</strong>: The character and factor variables can be converted to numeric variables. Again, it converts <code>TRUE</code> to 1 and <code>FALSE</code> to 0 for logic variable. For character variable, the numeric values take values from its ‘face’ value. For factor variable, the results are the levels of the factor. For example in this case there are 7 levels and the with number <em>500</em> is treated as the highest level, therefore it is recoded as 7 while <em>7</em> is the fifth highest level and is recoded as 5.</p>
+<p>In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?</p>
+<pre class="r"><code>df_new_convert &lt;- df %&gt;% mutate(char_var = as.numeric(as.factor(char_var)),
+  fct_var = as.numeric(as.character(fct_var)))</code></pre>
+<p><strong>Answer</strong>: When the character is converted to factor, the output doesn’t change but the levels are created based on the input character. So we can see that the number 10 is at level 2 from the bottom (since 1 comes before 2, 3 and so on) and that explains why it is eventually coded as 2 when converted to numeric at the end. For the other example, the final product keeps the ‘face value’ of the variable, ignoring the level information (which is due to the function as.character()).</p>
 <pre class="r"><code>samp = rnorm(100)
 length(samp)</code></pre>
 <pre><code>## [1] 100</code></pre>
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
+<p>This problem focuses on plotting and the use of inline R code.</p>
+<p>Create a data frame comprised of: * x: a random sample of size 1000 from a standard Normal distribution * y: a random sample of size 1000 from a standard Normal distribution * A logical vector indicating whether the x + y &gt; 0 * A numeric vector created by coercing the above logical vector * A factor vector created by coercing the above logical vector Write a short description of your vector using inline R code, including: * the size of the dataset * the mean and median of x * the proportion of cases for which the logical vector is TRUE</p>
+<p>Make a scatterplot of y vs x; color points using the logical variable (adding color = … inside of aes in your ggplot code should help). Make a second and third scatterplot that color points using the numeric and factor variables, respectively, and comment on the color scales.</p>
+<p>Export your first scatterplot to your project directory using ggsave.</p>
 <p>I can take the mean of the sample, too! The mean is -0.081. <code>this is code mean(samp)</code></p>
 <p>Learning assessment: Write a named code chunk that creates a variable containing a sample of size 500 from a random normal variable, computes the absolute value of each element, and produces a histogram of the result. Add an inline summary giving the median value rounded to two decimal places. What happens if you set eval = FALSE to the code chunk? What about echo = FALSE?</p>
 <pre class="r"><code>unif &lt;- rnorm(500)

@@ -25,25 +25,39 @@ set.seed(345)
 
 sample.size <- 10
 
-df <- tibble( x = runif(sample.size, 0, 5),
-              x_GT_2 = x > 2,
-              char_var = as.character(c(1:10)),
-              fct_var = as.factor(c(1:10)) 
-              )
+df <- tibble(
+x = runif(sample.size, 0, 5),
+x_GT_2 = x > 2,
+char_var = as.character(c(1:10)),
+fct_var = as.factor(c(1, 1, 2, 3, 1, 1, 7, 100, 500, 5))
+)
 
 print(df)
 ```
 
 Try to take the mean of each variable in your dataframe. What works and what doesn’t? Why?
 ```{r mean, echo = TRUE}
-df %>% summarise_each(funs(mean))
+df %>% summarise_all(funs(mean))
 ```
 **Answer**: the mean function only works with numeric and logic type data. With logic type data, it treats `TRUE` to 1 and `FALSE` to 0 before applying the mean function. And to be clear, it doesn't work with factor and character type data which is understandable given how subjective it must be to start assigning numbers to these types of data.
 
-In some cases, you can explicitly convert variables from one type to another. Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens? In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?
+In some cases, you can explicitly convert variables from one type to another. Write a code chunk that applies the as.numeric function to the logical, character, and factor variables (please show this chunk but not the output). What happens? 
+```{r convert_type, echo = TRUE}
+df_convert <- df %>% mutate(
+  x_GT_2 = as.numeric(x_GT_2),
+  char_var = as.numeric(char_var),
+  fct_var = as.numeric(fct_var)
+  )
+```
+**Answer**: The character and factor variables can be converted to numeric variables.
+Again, it converts `TRUE` to 1 and `FALSE` to 0 for logic variable. For character variable, the numeric values take values from its 'face' value. For factor variable, the results are the levels of the factor. For example in this case there are 7 levels and the with number *500* is treated as the highest level, therefore it is recoded as 7 while *7* is the fifth highest level and is recoded as 5.
 
-Here's a **code chunk** that samples from 
-a _normal distribution_:
+In a second code chunk, convert your character variable from character to factor to numeric; similarly, convert your factor variable from factor to character to numeric. What happens?
+```{r convert_type_V2, echo = TRUE, eval = FALSE}
+df_new_convert <- df %>% mutate(char_var = as.numeric(as.factor(char_var)),
+  fct_var = as.numeric(as.character(fct_var)))
+```
+**Answer**: When the character is converted to factor, the output doesn't change but the levels are created based on the input character. So we can see that the number 10 is at level 2 from the bottom (since 1 comes before 2, 3 and so on) and that explains why it is eventually coded as 2 when converted to numeric at the end. For the other example, the final product keeps the 'face value' of the variable, ignoring the level information (which is due to the function as.character()).
 
 ```{r sample_chunk, echo = TRUE}
 samp = rnorm(100)
@@ -51,6 +65,22 @@ length(samp)
 ```
 
 # Problem 2
+
+This problem focuses on plotting and the use of inline R code.
+
+Create a data frame comprised of:
+* x: a random sample of size 1000 from a standard Normal distribution
+* y: a random sample of size 1000 from a standard Normal distribution
+* A logical vector indicating whether the x + y > 0
+* A numeric vector created by coercing the above logical vector
+* A factor vector created by coercing the above logical vector
+Write a short description of your vector using inline R code, including: * the size of the dataset * the mean and median of x * the proportion of cases for which the logical vector is TRUE
+
+Make a scatterplot of y vs x; color points using the logical variable (adding color = ... inside of aes in your ggplot code should help). Make a second and third scatterplot that color points using the numeric and factor variables, respectively, and comment on the color scales.
+
+Export your first scatterplot to your project directory using ggsave.
+
+
 
 I can take the mean of the sample, too!
 The mean is `r round(mean(samp), 3)`.
